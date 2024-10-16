@@ -5,12 +5,17 @@ exports.handler = async function(event, context) {
     // Use dynamic import for ES Module
     const fetch = (await import('node-fetch')).default;
 
-    const ACCESS_KEY = process.env.UNSPLASH_KEY;
+    const ACCESS_KEY = process.env.ACCESS_KEY;
     if (!ACCESS_KEY) {
       throw new Error("Unsplash access key is missing");
     }
+    const searchTerm = event.queryStringParameters || 'funny'; // Default search term if none provided
 
-    const response = await fetch(`https://api.unsplash.com/photos/random?query=football&orientation=landscape&content_filter=low&client_id=${ACCESS_KEY}`);
+    // Log query parameters and access key
+    // console.log('Query Parameters:', event.queryStringParameters);
+    // console.log('Search Term:', searchTerm);
+
+    const response = await fetch(`https://api.unsplash.com/photos/random?query=${encodeURIComponent(searchTerm)}&orientation=landscape&content_filter=low&client_id=${ACCESS_KEY}`);
     
     if (!response.ok) {
       throw new Error(`Error fetching Unsplash data: ${response.statusText}`);
