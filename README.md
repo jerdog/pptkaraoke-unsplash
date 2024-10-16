@@ -22,10 +22,10 @@ File descriptions:
 - `index-*.html` - the subsequent karaoke presentation files that you will duplicate from the first, and then edit accordingly.
 - `img/placeholder_logo.png` - the image used as a placeholder for the conference/event overlay logo. Add your logo here, and then update it in each of the presentation files (see below):
 ```html
-			<div class="slides" id="slides-container">
-				<div class="overlay">
-					<img src="img/placeholder_logo.png" width="100px">
-				</div>
+<div class="slides" id="slides-container">
+  <div class="overlay">
+    <img src="img/placeholder_logo.png" width="100px">
+  </div>
 ```
 - `netlify/functions/unsplash.js` - the Unsplash API Netlify Function that is used to pull images from Unsplash. You will need to edit this file to include your Unsplash API key.
 - `netlify.toml` - the Netlify configuration file. By default, this is the bare minimum needed to build the project on Netlify.
