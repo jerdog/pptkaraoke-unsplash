@@ -6,8 +6,8 @@ const numberOfSlides = queryParams.get('slides') || 5; // Default to 5 slides if
 
 // Initialize Reveal.js
  Reveal.initialize({
-        width: '60%',
-        height: '60%',
+        width: '70%',
+        height: '70%',
         margin: 0.05,
         hash: true,
         controls: false,
