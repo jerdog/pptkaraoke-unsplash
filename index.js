@@ -57,7 +57,7 @@ function generateSlides(photos) {
           const slide = document.createElement('section');
           slide.innerHTML = 
             "<figure>" + 
-                "<a href=" + photo.links.download + ">" +
+                "<a href=" + photo.links.download_location + ">" +
                 "<img src=" + photo.urls.regular + " alt=" + photo.alt_description + " style=width:100%; height:auto;></a>" + 
                     "<figcaption style=font-size:15px;>" +
                         // API requires using profile link with utm: ?utm_source=your_app_name&utm_medium=referral
