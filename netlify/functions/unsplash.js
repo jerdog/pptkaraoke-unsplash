@@ -4,9 +4,9 @@ exports.handler = async function(event, context) {
   const numberOfSlides = event.queryStringParameters.slides || 8; // Default to 8 slides if not provided, for a 2min karaoke presentation
 
   // Log received query parameters
-  console.log('Received Query Parameters:', event.queryStringParameters);
-  console.log('Search Term:', searchTerm);
-  console.log('Number of Slides:', numberOfSlides);
+  // console.log('Received Query Parameters:', event.queryStringParameters);
+  // console.log('Search Term:', searchTerm);
+  // console.log('Number of Slides:', numberOfSlides);
   // console.log('Access Key Present:', !!ACCESS_KEY); // To confirm the key is available (Don't log the actual key)
 
   try {
