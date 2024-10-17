@@ -55,9 +55,17 @@ function generateSlides(photos) {
     photos.forEach(photo => {
         if (photo && photo.urls && photo.urls.regular) { // Ensure the required properties exist
           const slide = document.createElement('section');
-          slide.innerHTML = `<figure><img src="${photo.urls.regular}" alt="${photo.alt_description}" style="width:100%; height:auto;">
-            <figcaption style="font-size:15px">via <a href="${photo.urls.regular}" target="_blank">Unsplash</a>, 
-            Photographer: ${photo.user ? photo.user.name : 'Unknown'}</figcaption></figure>`;
+          slide.innerHTML = 
+            "<figure>" + 
+                "<a href=" + photo.links.download + ">" +
+                "<img src=" + photo.urls.regular + " alt=" + photo.alt_description + " style=width:100%; height:auto;></a>" + 
+                    "<figcaption style=font-size:15px;>" +
+                        // API requires using profile link with utm: ?utm_source=your_app_name&utm_medium=referral
+                        "Photo by <a href=" + photo.user.links.html + 
+                            "?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral target=_blank>" + photo.user.name + " </a> " +
+                        "on <a href=https://unsplash.com/?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral target=_blank>Unsplash</a>" +
+                    "<figcaption>" + 
+            "</figure>";
           document.getElementById('autogenSlides').appendChild(slide);
           Reveal.sync(); // Sync Reveal.js after dynamically adding content
         } else {
