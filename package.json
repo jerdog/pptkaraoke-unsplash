@@ -106,7 +106,6 @@
     }
   },
   "dependencies": {
-    "netlify-cli": "*",
-    "node-fetch": "^3.3.2"
+    "netlify-cli": "*"
   }
 }

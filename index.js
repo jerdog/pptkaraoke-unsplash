@@ -2,7 +2,9 @@
 const queryParams = new URLSearchParams(window.location.search);
 const searchTermsElement = document.getElementById('searchTerms');
 const searchTerm = searchTermsElement.getAttribute('data-query') || 'funny photos'; // Default to 'funny photos' if not provided
-const numberOfSlides = queryParams.get('slides') || 5; // Default to 5 slides if not provided
+const numberOfSlides = queryParams.get('slides') || 8; // Default to 8 slides if not provided, for a 2min karaoke presentation
+
+console.log('Search Term:', searchTerm);
 
 // Initialize Reveal.js
  Reveal.initialize({
@@ -23,41 +25,46 @@ const numberOfSlides = queryParams.get('slides') || 5; // Default to 5 slides if
         showNotes: false,
         viewDistance: 5,
 
-
-
         // Learn about plugins: https://revealjs.com/plugins/
         plugins: [ RevealMarkdown, RevealHighlight ]
     });
 
-// Function to generate slides dynamically
-function fetchImages() {
-    const url = `/.netlify/functions/unsplash?query=${encodeURIComponent(searchTerm)}`;
-    for (let i = 0; i < numberOfSlides; i++) {
-        // Fetch the random image data from your Netlify function
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok. Error status: ${response.status}; ${searchTerm}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Use the data to create a slide for each image
-                generateSlides(data);
-            })
-            .catch(error => console.error('Error fetching data from Netlify function:', error));
+// Function to fetch data from the Netlify function
+function fetchSlides() {
+    const url = `/.netlify/functions/unsplash?query=${encodeURIComponent(searchTerm)}&slides=${numberOfSlides}`;
+    // console.log('Constructed URL:', url); // Log to ensure it's correct
+  
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
-}
+        return response.json();
+      })
+      .then(data => {
+        // console.log('Unsplash API Response:', data); // Log the API response
+        generateSlides(data); // Use the data to generate slides
+      })
+      .catch(error => console.error('Error fetching data from Netlify function:', error));
+  }
 
 // Function to generate slides dynamically
-function generateSlides(data) {
-    // Fetch the random image data from your Netlify function
-    const photo = data; // The data returned by the Unsplash API
-    const slide = document.createElement('section');
-    slide.innerHTML = `<figure><img src="${photo.urls.regular}" alt="${photo.alt_description}" style="width:100%; height:auto;"><figcaption style="font-size:15px">via <a href="${photo.urls.regular}" target="_blank">Unsplash</a>, Photographer: ${photo.user.name}</figcaption></figure>`;
-    document.getElementById('autogenSlides').appendChild(slide);
-    Reveal.sync(); // Sync Reveal.js after dynamically adding content
-}
+function generateSlides(photos) {
+    console.log('Photos Data:', photos);
+
+    photos.forEach(photo => {
+        if (photo && photo.urls && photo.urls.regular) { // Ensure the required properties exist
+          const slide = document.createElement('section');
+          slide.innerHTML = `<figure><img src="${photo.urls.regular}" alt="${photo.alt_description}" style="width:100%; height:auto;">
+            <figcaption style="font-size:15px">via <a href="${photo.urls.regular}" target="_blank">Unsplash</a>, 
+            Photographer: ${photo.user ? photo.user.name : 'Unknown'}</figcaption></figure>`;
+          document.getElementById('autogenSlides').appendChild(slide);
+          Reveal.sync(); // Sync Reveal.js after dynamically adding content
+        } else {
+          console.warn('Missing photo data:', photo); // Log missing or malformed data
+        }
+      });
+  }
 
 // Generate the slides based on query parameters
-fetchImages();
+fetchSlides();
