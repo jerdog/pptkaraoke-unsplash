@@ -1,9 +1,16 @@
+// Access the query string parameters
 const queryParams = new URLSearchParams(window.location.search);
+// Get the number of slides or default to 5
+const numberOfSlides = queryParams.get('slides') || 8; // Default to 8 slides if not provided, for a 2min karaoke presentation
+// Get the delay between slides or default to 15 seconds (15000 ms)
+const delay = (queryParams.get('delay') || 15) * 1000;
+// Get the search term from the data attribute
 const searchTermsElement = document.getElementById('searchTerms');
 const searchTerm = searchTermsElement.getAttribute('data-query') || 'funny photos'; // Default to 'funny photos' if not provided
-const numberOfSlides = queryParams.get('slides') || 8; // Default to 8 slides if not provided, for a 2min karaoke presentation
 
 console.log('Search Term:', searchTerm);
+console.log('Number of Slides:', numberOfSlides);
+console.log('Delay:', delay);
 
 // Cache DOM elements
 const autogenSlidesElement = document.getElementById('autogenSlides');
@@ -23,7 +30,8 @@ Reveal.initialize({
     history: true,
     loop: false,
     help: true,
-    autoSlide: 15000,
+    // autoSlide: 15000,
+    autoSlide: delay,
     showNotes: false,
     viewDistance: 5,
 
@@ -65,17 +73,23 @@ function generateSlides(photos) {
 
     photos.forEach(photo => {
         if (photo && photo.urls && photo.urls.regular) { // Ensure the required properties exist
+            // Create a new slide element (section)
             const slide = document.createElement('section');
+
+            // Add custom data attributes to the section tag
+            slide.setAttribute('data-background-image', photo.urls.regular);
+            slide.setAttribute('data-background-size', 'contain');
+            slide.setAttribute('data-background-position', 'center');
+            slide.setAttribute('data-author', photo.user.name); // Author's name
+            slide.setAttribute('data-location', photo.location ? photo.location.name : 'Unknown'); // Location (if available)
+            slide.setAttribute('data-created-at', photo.created_at); // Photo creation date
+
             slide.innerHTML = `
-                <figure>
-                    <a href="${photo.links.download_location}">
-                        <img src="${photo.urls.regular}" alt="${photo.alt_description}" style="width:100%; height:auto;">
-                    </a>
-                    <figcaption style="font-size:15px;">
-                        Photo by <a href="${photo.user.links.html}?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">${photo.user.name}</a> 
-                        on <a href="https://unsplash.com/?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">Unsplash</a>
-                    </figcaption>
-                </figure>`;
+                <div class="desc">
+                    <font size="3rem;" color="white">
+                        Photo by <a href="${photo.user.links.html}?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">${photo.user.name}</a> on <a href="https://unsplash.com/?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">Unsplash</a>
+                    </font>
+                </div>`;
             autogenSlidesElement.appendChild(slide);
             Reveal.sync(); // Sync Reveal.js after dynamically adding content
         } else {

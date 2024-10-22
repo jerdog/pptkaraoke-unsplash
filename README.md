@@ -2,16 +2,16 @@
 
 ## Overview
 
-This project is a web application for [PowerPoint Karaoke](https://en.wikipedia.org/wiki/PowerPoint_karaoke), with a twist: all of the images are randomly pulled from the [Unsplash API](https://unsplash.com/developers) on load. 
+This project is a web application for [PowerPoint Karaoke](https://en.wikipedia.org/wiki/PowerPoint_karaoke), with a twist: all of the images are randomly pulled from the [Unsplash API](https://unsplash.com/developers) on load.
 
 ## Usage
 
 To use this project, you will first need to [fork it](https://github.com/jerdog/pptkaraoke-unsplash/fork), then clone that fork to your local machine (see below), and then open the `index.html` file in your browser. You will of course need to edit specific information for your presentation/event (see below), but by default the slideshow shows 5 slides, auto-advancing every 15 seconds. The below parameters can be adjusted in the URL:
 
 - `?slides=X` - the number of slides to show (default 8 for a 2min karaoke presentation)
-- TODO: `?delay=X` - the delay between slides in seconds (default 15)
+- `?delay=X` - the delay between slides in seconds (default 15)
 
-For example: `https://localhost:8888/index-1.html/?slides=10&delay=10` will show 10 slides, auto-advancing every 10 seconds. Not including those parameters will show the default 5 slides, auto-advancing every 15 seconds.
+For example: `https://localhost:8888/index-1.html/?slides=10&delay=10` will show 10 slides, auto-advancing every 10 seconds (1min 40sec presentation). Not including those parameters will show the default 8 slides, auto-advancing every 15 seconds (2min presentation).
 
 ## Configuration
 
