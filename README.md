@@ -28,6 +28,7 @@ File descriptions:
   </div>
 ```
 - `netlify/functions/unsplash.js` - the Unsplash API Netlify Function that is used to pull images from Unsplash. You will need to edit this file to include your Unsplash API key.
+- `netlify/functions/randomTalkTitle.js` - random talk title pulled from the `netlify/functions/talkTitles.json` file. Edit the `talkTitles.json` file with your own talk titles.
 - `netlify.toml` - the Netlify configuration file. By default, this is the bare minimum needed to build the project on Netlify.
 
 
