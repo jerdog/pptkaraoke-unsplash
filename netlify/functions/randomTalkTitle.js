@@ -15,12 +15,27 @@ const path = require('path');
 //     'The Ethics of AI'
 // ];
 
-// Path to the JSON file for storing the daily talk title
-const talkTitlesPath = path.resolve(process.cwd(), 'netlify/functions/talkTitles.json');
+// // Path to the JSON file for storing the daily talk title
+// const talkTitlesPath = path.resolve(process.cwd(), 'netlify/functions/talkTitles.json');
+// console.log('talkTitlesPath:', talkTitlesPath);
+
+// Path to the original JSON file in the deployed directory
+const originalTalkTitlesPath = path.resolve(__dirname, 'talkTitles.json');
+
+// Path to the writable /tmp directory in Netlify Functions
+const tmpTalkTitlesPath = path.resolve('/tmp', 'talkTitles.json');
 
 // Function to get today's date in YYYY-MM-DD format
 function getTodayDate() {
     return new Date().toISOString().split('T')[0];
+}
+
+// Function to ensure talkTitles.json exists in /tmp
+function ensureTmpFile() {
+    if (!fs.existsSync(tmpTalkTitlesPath)) {
+        fs.copyFileSync(originalTalkTitlesPath, tmpTalkTitlesPath);
+        console.log('Copied talkTitles.json to /tmp');
+    }
 }
 
 // // Function to get a new random talk title
@@ -32,27 +47,24 @@ function getTodayDate() {
 // Function to read talk titles from JSON file
 function readTalkTitles() {
     try {
-        if (fs.existsSync(talkTitlesPath)) {
-            const fileData = fs.readFileSync(talkTitlesPath, 'utf8').trim();
-            
-            if (!fileData) {
-                throw new Error('talkTitles.json is empty.');
-            }
+        ensureTmpFile(); // Ensure /tmp/talkTitles.json exists
+        const fileData = fs.readFileSync(tmpTalkTitlesPath, 'utf8').trim();
 
-            return JSON.parse(fileData);
-        } else {
-            throw new Error('talkTitles.json file does not exist.');
+        if (!fileData) {
+            throw new Error('talkTitles.json is empty.');
         }
+
+        return JSON.parse(fileData);
     } catch (error) {
         console.error('Error reading talkTitles.json:', error.message);
-        return []; // Return an empty array if the file is empty or malformed
+        return [];
     }
 }
 
 // Function to write updated talk titles to JSON file
 function writeTalkTitles(titles) {
     try {
-        fs.writeFileSync(talkTitlesPath, JSON.stringify(titles, null, 2));
+        fs.writeFileSync(tmpTalkTitlesPath, JSON.stringify(titles, null, 2));
         console.log('Updated talkTitles.json successfully.');
     } catch (error) {
         console.error('Error writing to talkTitles.json:', error.message);
@@ -65,30 +77,21 @@ function getUnusedTalkTitle() {
     const titles = readTalkTitles();
 
     if (!titles || titles.length === 0) {
-        throw new Error('The talkTitles.json file is empty or not properly formatted.');
+        throw new Error('No valid entries in talkTitles.json.');
     }
 
-    // Find a title with last_used earlier than today or null
     let unusedTitle = titles.find(title => !title.last_used || title.last_used < today);
 
     if (!unusedTitle) {
-        // If no such title is found, fallback to a random title
-        console.warn('All titles have been used today. Falling back to a random title.');
+        console.warn('All titles used today. Selecting a random fallback.');
         const randomIndex = Math.floor(Math.random() * titles.length);
         unusedTitle = titles[randomIndex];
     }
 
-    if (unusedTitle) {
-        // Update its last_used date to today
-        unusedTitle.last_used = today;
+    unusedTitle.last_used = today;
+    writeTalkTitles(titles);
 
-        // Write the updated titles back to the JSON file
-        writeTalkTitles(titles);
-
-        return unusedTitle.title;
-    }
-
-    throw new Error('No valid talk title found.');
+    return unusedTitle.title;
 }
 
 
