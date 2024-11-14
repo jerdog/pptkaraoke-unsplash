@@ -6,7 +6,8 @@ const numberOfSlides = queryParams.get('slides') || 8; // Default to 8 slides if
 const delay = (queryParams.get('delay') || 15) * 1000;
 // Get the search term from the data attribute
 const searchTermsElement = document.getElementById('searchTerms');
-const searchTerm = searchTermsElement.getAttribute('data-query') || 'funny photos'; // Default to 'funny photos' if not provided
+// const searchTerm = searchTermsElement.getAttribute('data-query') || 'funny photos'; // Default to 'funny photos' if not provided
+const searchTerm = await fetchTalkTitle();
 
 console.log('Search Term:', searchTerm);
 console.log('Number of Slides:', numberOfSlides);
@@ -50,7 +51,8 @@ function debounce(func, wait) {
 
 // Function to fetch data from the Netlify function
 async function fetchSlides() {
-    const url = `/.netlify/functions/unsplash?query=${encodeURIComponent(searchTerm)}&slides=${numberOfSlides}`;
+    // const url = `/.netlify/functions/unsplash?query=${encodeURIComponent(searchTerm)}&slides=${numberOfSlides}`;
+    const url = `/.netlify/functions/unsplash?query=${searchTerm}&slides=${numberOfSlides}`;
     // console.log(`Constructed URL: ${url}`); // Log to ensure it's correct
 
     try {
@@ -70,6 +72,15 @@ async function fetchSlides() {
 // Function to generate slides dynamically
 function generateSlides(photos) {
     console.log('Photos Data:', photos);
+
+    const slideTitle = document.createElement('section');
+    slideTitle.setAttribute('data-background-image','https://picsum.photos/1920/1080/')
+    slideTitle.setAttribute('data-background-size', 'contain');
+    slideTitle.setAttribute('data-background-position', 'center');
+    slideTitle.setAttribute('data-background-opacity', '0.5');
+        slideTitle.innerHTML = `<h3>${searchTerm}</h3>`;
+
+    autogenSlidesElement.appendChild(slideTitle);
 
     photos.forEach(photo => {
         if (photo && photo.urls && photo.urls.regular) { // Ensure the required properties exist
@@ -96,6 +107,21 @@ function generateSlides(photos) {
             console.warn('Missing photo data:', photo); // Log missing or malformed data
         }
     });
+}
+
+// function to get random talk title
+async function fetchTalkTitle() {
+    try {
+        const response = await fetch('/.netlify/functions/randomTalkTitle');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.title;
+    } catch (error) {
+        console.error('Error fetching daily talk title:', error);
+        return 'nature'; // Fallback search term
+    }
 }
 
 // Generate the slides based on query parameters
