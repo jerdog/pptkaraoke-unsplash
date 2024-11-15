@@ -18,6 +18,34 @@
 			.reveal img {max-height: 60vh;}
 			.reveal div.desc { position:fixed; bottom:0; width:100%; display: flex; justify-content: center; z-index: 2000;}
 		</style>
+
+		<script>
+			// Function to get query variables from the URL
+			function getQueryVariable(variable) {
+				const query = window.location.search.substring(1);
+				const vars = query.split('&');
+				for (let i = 0; i < vars.length; i++) {
+					const pair = vars[i].split('=');
+					if (decodeURIComponent(pair[0]) === variable) {
+						return decodeURIComponent(pair[1]);
+					}
+				}
+				return null;
+			}
+
+			document.addEventListener('DOMContentLoaded', () => {
+				// Delay execution until initSlideshow is available
+				if (typeof window.initSlideshow === 'function') {
+					const slides = getQueryVariable('slides') || 5;
+					const delay = getQueryVariable('delay') || 10;
+					const ai = getQueryVariable('ai') || 'false';
+
+					window.initSlideshow({ slides, delay, ai });
+				} else {
+					console.error('initSlideshow is not available.');
+				}
+			});
+		</script>
 	</head>
 	<body>
 		<div id="searchTerms" data-query="AI driven cars"></div>

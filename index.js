@@ -1,16 +1,12 @@
 // Access the query string parameters
 const queryParams = new URLSearchParams(window.location.search);
-// Get the number of slides or default to 5
-const numberOfSlides = queryParams.get('slides') || 8; // Default to 8 slides if not provided, for a 2min karaoke presentation
-// Get the delay between slides or default to 15 seconds (15000 ms)
 const delay = (queryParams.get('delay') || 15) * 1000;
-// Get the search term from the data attribute
-const searchTermsElement = document.getElementById('searchTerms');
-// const searchTerm = searchTermsElement.getAttribute('data-query') || 'funny photos'; // Default to 'funny photos' if not provided
-const searchTerm = await fetchTalkTitle();
+const slides = (queryParams.get('slides') || 5); // Default to 5 slides if not provided, for a 2min karaoke presentation
+const title = queryParams.get('title') || 'Default Title'; // Default to 'Default Title' if not provided
 
-console.log('Search Term:', searchTerm);
-console.log('Number of Slides:', numberOfSlides);
+// Log received query parameters
+console.log('Search Term:', title);
+console.log('Number of Slides:', slides);
 console.log('Delay:', delay);
 
 // Cache DOM elements
@@ -40,8 +36,26 @@ Reveal.initialize({
     plugins: [RevealMarkdown, RevealHighlight]
 });
 
+console.log('Slideshow initialized.');
+window.initSlideshow = initSlideshow;
+
+// Generate the slides based on query parameters
+// console.log('Generating slides based on query parameters...');
+// const debouncedFetchTitle = debounce(getTalkTitle, 300);
+// const debouncedFetchSlides = debounce(fetchSlides, 300);
+// debouncedFetchTitle()
+// debouncedFetchSlides();
+
+// Main function to initialize the slideshow
+async function initSlideshow({ slides, delay, ai }) {
+    console.log('Initializing slideshow...');
+    const title = await getTalkTitle(ai);
+    fetchSlides(slides, delay, title);
+}
+
 // Debounce function to limit the rate of function execution
 function debounce(func, wait) {
+    console.log('Debouncing function...');
     let timeout;
     return function(...args) {
         clearTimeout(timeout);
@@ -50,80 +64,107 @@ function debounce(func, wait) {
 }
 
 // Function to fetch data from the Netlify function
-async function fetchSlides() {
-    // const url = `/.netlify/functions/unsplash?query=${encodeURIComponent(searchTerm)}&slides=${numberOfSlides}`;
-    const url = `/.netlify/functions/unsplash?query=${searchTerm}&slides=${numberOfSlides}`;
-    // console.log(`Constructed URL: ${url}`); // Log to ensure it's correct
+async function fetchSlides(slides, delay, title) {
+    console.log('Fetching slides...');
+//    for (let i = 0; i < slides; i++) {
+        try {
+            const response = await fetch(`/.netlify/functions/unsplash?query=${encodeURIComponent(title)}&slides=${slides}`);
+                if (!response.ok) throw new Error(`Unsplash request failed: ${response.status}`);
+            
+            const data = await response.json();
+            const photos = data.slides;
+            console.log('Fetched Photo:', photos);
 
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            photos.forEach(photo => {
+                // Create a new section for each photo
+                if (photo && photo.urls && photo.urls.regular) { // Ensure the required properties exist
+                    // Create a new slide element (section)
+                    const slide = document.createElement('section');
+                    // Add custom data attributes to the section tag
+                    slide.setAttribute('data-background-image', photo.urls.regular);
+                    slide.setAttribute('data-background-size', 'contain');
+                    slide.setAttribute('data-background-position', 'center');
+                    slide.setAttribute('data-author', photo.user.name); // Author's name
+                    slide.setAttribute('data-location', photo.location ? photo.location.name : 'Unknown'); // Location (if available)
+                    slide.setAttribute('data-created-at', photo.created_at); // Photo creation date
+                    slide.innerHTML = `
+                    <div class="desc">
+                        <font size="3rem;" color="white">
+                            Photo by <a href="${photo.user.links.html}?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">${photo.user.name}</a> on <a href="https://unsplash.com/?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">Unsplash</a>
+                        </font>
+                    </div>`;
+                    document.querySelector('.slides').appendChild(slide);
+                    Reveal.sync();
+                } else { 
+                    console.warn('Missing photo data:', photo); // Log missing or malformed data for debugging
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching data from Netlify function:', error);
+            alert('An error occurred while fetching slides. Please try again later.');
         }
-        const data = await response.json();
-        console.log('Unsplash API Response:', data); // Log the API response
-        generateSlides(data); // Use the data to generate slides
-    } catch (error) {
-        console.error('Error fetching data from Netlify function:', error);
-        alert('An error occurred while fetching slides. Please try again later.');
+        console.log('Unsplash API Response:', data); // Log the API response for debugging
     }
-}
 
 // Function to generate slides dynamically
-function generateSlides(photos) {
-    console.log('Photos Data:', photos);
+// function generateSlides(data, title) {
+//     const photos = data.slides;
+//     console.log('Photos Data:', photos);
 
-    const slideTitle = document.createElement('section');
-    slideTitle.setAttribute('data-background-image','https://picsum.photos/1920/1080/')
-    slideTitle.setAttribute('data-background-size', 'contain');
-    slideTitle.setAttribute('data-background-position', 'center');
-    slideTitle.setAttribute('data-background-opacity', '0.5');
-        slideTitle.innerHTML = `<h3>${searchTerm}</h3>`;
+//     photos.forEach(photo => {
+//         if (photo && photo.urls && photo.urls.regular) { // Ensure the required properties exist
+//             // Create a new slide element (section)
+//             const slide = document.createElement('section');
 
-    autogenSlidesElement.appendChild(slideTitle);
+//             // Add custom data attributes to the section tag
+//             slide.setAttribute('data-background-image', photo.urls.regular);
+//             slide.setAttribute('data-background-size', 'contain');
+//             slide.setAttribute('data-background-position', 'center');
+//             slide.setAttribute('data-author', photo.user.name); // Author's name
+//             slide.setAttribute('data-location', photo.location ? photo.location.name : 'Unknown'); // Location (if available)
+//             slide.setAttribute('data-created-at', photo.created_at); // Photo creation date
 
-    photos.forEach(photo => {
-        if (photo && photo.urls && photo.urls.regular) { // Ensure the required properties exist
-            // Create a new slide element (section)
-            const slide = document.createElement('section');
-
-            // Add custom data attributes to the section tag
-            slide.setAttribute('data-background-image', photo.urls.regular);
-            slide.setAttribute('data-background-size', 'contain');
-            slide.setAttribute('data-background-position', 'center');
-            slide.setAttribute('data-author', photo.user.name); // Author's name
-            slide.setAttribute('data-location', photo.location ? photo.location.name : 'Unknown'); // Location (if available)
-            slide.setAttribute('data-created-at', photo.created_at); // Photo creation date
-
-            slide.innerHTML = `
-                <div class="desc">
-                    <font size="3rem;" color="white">
-                        Photo by <a href="${photo.user.links.html}?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">${photo.user.name}</a> on <a href="https://unsplash.com/?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">Unsplash</a>
-                    </font>
-                </div>`;
-            autogenSlidesElement.appendChild(slide);
-            Reveal.sync(); // Sync Reveal.js after dynamically adding content
-        } else {
-            console.warn('Missing photo data:', photo); // Log missing or malformed data
-        }
-    });
-}
+//             slide.innerHTML = `
+//                 <div class="desc">
+//                     <font size="3rem;" color="white">
+//                         Photo by <a href="${photo.user.links.html}?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">${photo.user.name}</a> on <a href="https://unsplash.com/?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">Unsplash</a>
+//                     </font>
+//                 </div>`;
+//             autogenSlidesElement.appendChild(slide);
+//             Reveal.sync(); // Sync Reveal.js after dynamically adding content
+//         } else {
+//             console.warn('Missing photo data:', photo); // Log missing or malformed data
+//         }
+//     });
+// }
 
 // function to get random talk title
-async function fetchTalkTitle() {
+async function getTalkTitle(ai) {
+    console.log('Getting talk title...');
     try {
-        const response = await fetch('/.netlify/functions/randomTalkTitle');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        const response = await fetch(`/.netlify/functions/randomTalkTitle?ai=${ai}`);
         const data = await response.json();
-        return data.title;
+        
+        if (data.title) {
+            const slideTitle = document.createElement('section');
+                slideTitle.setAttribute('data-background-image','https://picsum.photos/1920/1080/')
+                slideTitle.setAttribute('data-background-size', 'contain');
+                slideTitle.setAttribute('data-background-position', 'center');
+                slideTitle.setAttribute('data-background-opacity', '0.5');
+                if (title) {
+                    slideTitle.innerHTML = `<h3>${data.title}</h3>`;
+                } else {
+                    throw new Error(data.error || 'Failed to fetch talk title.');
+                }          
+
+            autogenSlidesElement.appendChild(slideTitle);
+        
+            return data.title;
+        } else {
+            throw new Error(data.error || 'Failed to fetch talk title.');
+        }
     } catch (error) {
-        console.error('Error fetching daily talk title:', error);
-        return 'nature'; // Fallback search term
+        console.error('Error fetching talk title:', error);
+        return 'Fallback Talk Title'; // Provide a fallback title
     }
 }
-
-// Generate the slides based on query parameters
-const debouncedFetchSlides = debounce(fetchSlides, 300);
-debouncedFetchSlides();
