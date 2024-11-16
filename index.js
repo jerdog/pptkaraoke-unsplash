@@ -14,7 +14,8 @@ console.log('Number of Slides:', numberOfSlides);
 console.log('Delay:', delay);
 
 // Cache DOM elements
-const autogenSlidesElement = document.getElementById('autogenSlides');
+// const autogenSlidesElement = document.getElementById('autogenSlides');
+const slidesElement = document.getElementById('slides-container');
 
 // Initialize Reveal.js
 Reveal.initialize({
@@ -79,9 +80,11 @@ function generateSlides(photos) {
     slideTitle.setAttribute('data-background-position', 'center');
     slideTitle.setAttribute('data-background-opacity', '0.5');
 
-        slideTitle.innerHTML = `<h3>${searchTerm}</h3>`;
+    slideTitle.innerHTML = `<h3>${searchTerm}</h3>`;
 
-    autogenSlidesElement.appendChild(slideTitle);
+    // autogenSlidesElement.appendChild(slideTitle);
+    slidesElement.appendChild(slideTitle);
+    // Reveal.sync(); // Sync Reveal.js after dynamically adding content
 
     photos.forEach(photo => {
         if (photo && photo.urls && photo.urls.regular) { // Ensure the required properties exist
@@ -97,17 +100,25 @@ function generateSlides(photos) {
             slide.setAttribute('data-created-at', photo.created_at); // Photo creation date
 
             slide.innerHTML = `
-                <div class="desc">
+                <div class="desc" style="position:fixed; bottom:0; width:100%; display: flex; justify-content: center; z-index: 2000;">
                     <font size="3rem;" color="white">
                         Photo by <a href="${photo.user.links.html}?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">${photo.user.name}</a> on <a href="https://unsplash.com/?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">Unsplash</a>
                     </font>
                 </div>`;
-            autogenSlidesElement.appendChild(slide);
+            // autogenSlidesElement.appendChild(slideTitle);
+            slidesElement.appendChild(slide);
             Reveal.sync(); // Sync Reveal.js after dynamically adding content
         } else {
             console.warn('Missing photo data:', photo); // Log missing or malformed data
         }
     });
+
+    // After slides generated, add final slide
+    const finalSlide = document.createElement('section');
+    finalSlide.innerHTML = `
+        <h3>End.</h3>
+        <h5>Please clap.</h5>`;
+    slidesElement.appendChild(finalSlide);
 }
 
 // function to get random talk title
