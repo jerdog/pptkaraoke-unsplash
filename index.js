@@ -10,8 +10,8 @@ console.log('Number of Slides:', slides);
 console.log('Delay:', delay);
 
 // Cache DOM elements
-const autogenSlidesElement = document.getElementById('autogenSlides');
-const titleElement = document.getElementById('titleSlide');
+// const autogenSlidesElement = document.getElementById('autogenSlides');
+const slidesElement = document.getElementById('slides-container');
 
 // Initialize Reveal.js
 Reveal.initialize({
@@ -90,8 +90,8 @@ async function getTalkTitle(ai) {
                     throw new Error(data.error || 'Failed to fetch talk title.');
                 }          
 
-                document.querySelector('.slides').appendChild(slideTitle);
-                Reveal.sync();
+                slidesElement.appendChild(slideTitle);
+                // Reveal.sync();
         
             return data.title;
         } else {
@@ -126,14 +126,15 @@ async function fetchSlides(slides, delay, title) {
                     slide.setAttribute('data-author', photo.user.name); // Author's name
                     slide.setAttribute('data-location', photo.location ? photo.location.name : 'Unknown'); // Location (if available)
                     slide.setAttribute('data-created-at', photo.created_at); // Photo creation date
-                    slide.setAttribute('data-autoslide', delay  || 15) * 1000; // Photo description
+                    slide.setAttribute('data-autoslide', delay  || 15) * 1000; // Autoslide delay
                     slide.innerHTML = `
                     <div class="desc">
                         <font size="3rem;" color="white">
                             Photo by <a href="${photo.user.links.html}?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">${photo.user.name}</a> on <a href="https://unsplash.com/?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">Unsplash</a>
                         </font>
                     </div>`;
-                    document.querySelector('.slides').appendChild(slide);
+                    // Append the slide to the slides container
+                    slidesElement.appendChild(slide);
                     Reveal.sync();
                 } else { 
                     console.warn('Missing photo data:', photo); // Log missing or malformed data for debugging
@@ -143,11 +144,14 @@ async function fetchSlides(slides, delay, title) {
             console.error('Error fetching data from Netlify function:', error);
             alert('An error occurred while fetching slides. Please try again later.');
         }
-    Reveal.sync(); // Sync slides
+
+    // Reveal.sync(); // Sync slides
     console.log('Slides synced. Total slides:', Reveal.getTotalSlides());
-    // End the slideshow after the last slides
-    const endSlide = document.createElement('section');
-        endSlide.innerHTML = `<h2>End</h2>`;
-        document.querySelector('.slides').appendChild(endSlide);
-        // Reveal.sync();
+
+    // After slides generated, add final slide
+    const finalSlide = document.createElement('section');
+    finalSlide.innerHTML = `
+        <h3>End.</h3>
+        <h5>Please clap.</h5>`;
+    slidesElement.appendChild(finalSlide);
     }
