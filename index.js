@@ -37,6 +37,9 @@ Reveal.initialize({
     plugins: [RevealMarkdown, RevealHighlight]
 });
 
+console.log('Reveal.js initialized with autoSlide:', delay * 1000);
+console.log('Reveal.js configuration:', Reveal.getConfig());
+
 console.log('Slideshow window initialized.');
 window.initSlideshow = initSlideshow;
 
@@ -80,7 +83,7 @@ async function getTalkTitle(ai) {
                 slideTitle.setAttribute('data-background-size', 'contain');
                 slideTitle.setAttribute('data-background-position', 'center');
                 slideTitle.setAttribute('data-background-opacity', '0.5');
-                slideTitle.setAttribute('data-autoslide', '0');
+                // slideTitle.setAttribute('data-autoslide', '0');
                 if (title) {
                     slideTitle.innerHTML = `<h3>${data.title}</h3>`;
                 } else {
@@ -88,7 +91,7 @@ async function getTalkTitle(ai) {
                 }          
 
                 document.querySelector('.slides').appendChild(slideTitle);
-                // Reveal.sync();
+                Reveal.sync();
         
             return data.title;
         } else {
@@ -123,6 +126,7 @@ async function fetchSlides(slides, delay, title) {
                     slide.setAttribute('data-author', photo.user.name); // Author's name
                     slide.setAttribute('data-location', photo.location ? photo.location.name : 'Unknown'); // Location (if available)
                     slide.setAttribute('data-created-at', photo.created_at); // Photo creation date
+                    slide.setAttribute('data-autoslide', delay  || 15) * 1000; // Photo description
                     slide.innerHTML = `
                     <div class="desc">
                         <font size="3rem;" color="white">
@@ -139,7 +143,8 @@ async function fetchSlides(slides, delay, title) {
             console.error('Error fetching data from Netlify function:', error);
             alert('An error occurred while fetching slides. Please try again later.');
         }
-
+    Reveal.sync(); // Sync slides
+    console.log('Slides synced. Total slides:', Reveal.getTotalSlides());
     // End the slideshow after the last slides
     const endSlide = document.createElement('section');
         endSlide.innerHTML = `<h2>End</h2>`;
