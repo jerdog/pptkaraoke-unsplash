@@ -1,6 +1,6 @@
 exports.handler = async function(event, context) {
   const ACCESS_KEY = process.env.ACCESS_KEY; // Use environment variable
-  const searchTerm = event.queryStringParameters.query || 'nature'; // Default to 'nature' if not provided
+  const searchTerm = event.queryStringParameters.query || 'funny tech'; // Default to 'funny tech' if not provided
   const numberOfSlides = event.queryStringParameters.slides || 8; // Default to 8 slides if not provided, for a 2min karaoke presentation
 
   // Log received query parameters
