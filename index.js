@@ -100,8 +100,8 @@ function generateSlides(photos) {
             slide.setAttribute('data-created-at', photo.created_at); // Photo creation date
 
             slide.innerHTML = `
-                <div class="desc" style="position:fixed; bottom:0; width:100%; display: flex; justify-content: center; z-index: 2000;">
-                    <font size="3rem;" color="white">
+                <div class="desc">
+                    <font size="3rem;" color="white" style="position:fixed; bottom:0; width:100%; display: flex; justify-content: center; z-index: 2000;">
                         Photo by <a href="${photo.user.links.html}?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">${photo.user.name}</a> on <a href="https://unsplash.com/?utm_source=Jerdog_PPT_Karaoke&utm_medium=referral" target="_blank">Unsplash</a>
                     </font>
                 </div>`;
