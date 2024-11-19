@@ -1,20 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// // Mock database of talk titles
-// const talkTitles = [
-//     'Nature and Technology',
-//     'The Art of Simplicity',
-//     'Innovations in AI',
-//     'Future of Work',
-//     'Cloud Computing Trends',
-//     'Data-Driven Development',
-//     'Developer Experience Matters',
-//     'Open Source Power',
-//     'Scaling Microservices',
-//     'The Ethics of AI'
-// ];
-
 // // Path to the JSON file for storing the daily talk title
 // const talkTitlesPath = path.resolve(process.cwd(), 'netlify/functions/talkTitles.json');
 // console.log('talkTitlesPath:', talkTitlesPath);

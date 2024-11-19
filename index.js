@@ -38,7 +38,7 @@ Reveal.initialize({
     viewDistance: 5,
 
     // Learn about plugins: https://revealjs.com/plugins/
-    plugins: [RevealMarkdown, RevealHighlight]
+    plugins: [RevealMarkdown]
 });
 
 // Debounce function to limit the rate of function execution
@@ -53,7 +53,7 @@ function debounce(func, wait) {
 // Function to fetch data from the Netlify function
 async function fetchSlides() {
     // const url = `/.netlify/functions/unsplash?query=${encodeURIComponent(searchTerm)}&slides=${numberOfSlides}`;
-    const url = `/.netlify/functions/unsplash?query=${searchTerm}&slides=${numberOfSlides}`;
+    const url = `/.netlify/functions/unsplash?query=funny+images+${searchTerm}&slides=${numberOfSlides}`;
     console.log(`Constructed URL: ${url}`); // Log to ensure it's correct
 
     try {
@@ -75,10 +75,11 @@ function generateSlides(photos) {
     console.log('Photos Data:', photos);
 
     const slideTitle = document.createElement('section');
-    slideTitle.setAttribute('data-background-image','https://picsum.photos/1920/1080/')
+    // slideTitle.setAttribute('data-background-image', "https://picsum.photos/1920/1080/");
     slideTitle.setAttribute('data-background-size', 'contain');
     slideTitle.setAttribute('data-background-position', 'center');
     slideTitle.setAttribute('data-background-opacity', '0.5');
+    slideTitle.setAttribute('data-autoslide', '0');
 
     slideTitle.innerHTML = `<h3>${searchTerm}</h3>`;
 
