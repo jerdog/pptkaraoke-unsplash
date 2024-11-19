@@ -3,6 +3,7 @@
 *.iws
 *.eml
 out/
+dist/
 .DS_Store
 .svn
 log/*.log
@@ -12,3 +13,4 @@ node_modules/
 .env
 # Local Netlify folder
 .netlify
+.vscode
