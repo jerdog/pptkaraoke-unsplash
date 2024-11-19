@@ -38,7 +38,7 @@ Reveal.initialize({
     viewDistance: 5,
 
     // Learn about plugins: https://revealjs.com/plugins/
-    plugins: [RevealMarkdown]
+    plugins: [RevealMarkdown, RevealAttribution]
 });
 
 // Debounce function to limit the rate of function execution
